@@ -539,32 +539,24 @@ jobs:
             ! -name '.git' \
             -exec rm -rf {} +
 
+          mkdir -p publish/srs
+          mkdir -p publish/mrs
+          mkdir -p publish/surge
+
           cp geosite.dat publish/
           cp geosite.dat.sha256sum publish/
           cp rulesets.sha256sum publish/
 
           if [ -d srs ]; then
-            find srs \
-              -maxdepth 1 \
-              -type f \
-              -name '*.srs' \
-              -exec cp {} publish/ \;
+            cp srs/*.srs publish/srs/ 2>/dev/null || true
           fi
 
           if [ -d mrs ]; then
-            find mrs \
-              -maxdepth 1 \
-              -type f \
-              -name '*.mrs' \
-              -exec cp {} publish/ \;
+            cp mrs/*.mrs publish/mrs/ 2>/dev/null || true
           fi
 
           if [ -d surge ]; then
-            find surge \
-              -maxdepth 1 \
-              -type f \
-              -name '*.list' \
-              -exec cp {} publish/ \;
+            cp surge/*.list publish/surge/ 2>/dev/null || true
           fi
 
           cd publish
