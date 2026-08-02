@@ -525,8 +525,13 @@ jobs:
 
           rm -rf publish
 
-          git fetch origin release
-          git worktree add publish origin/release
+          git fetch origin \
+            refs/heads/release:refs/remotes/origin/release
+
+          git worktree add \
+            --detach \
+            publish \
+            refs/remotes/origin/release
 
           find publish \
             -mindepth 1 \
@@ -565,7 +570,8 @@ jobs:
           cd publish
 
           git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.email \
+            "41898282+github-actions[bot]@users.noreply.github.com"
 
           git add -A
 
@@ -575,7 +581,7 @@ jobs:
             git commit \
               -m "Update generated rules ${{ steps.time.outputs.TIMESTAMP }}"
 
-            git push origin HEAD:release
+            git push origin HEAD:refs/heads/release
           fi
 
       - name: Release files with timestamp
