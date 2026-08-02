@@ -28,6 +28,15 @@ def fetch_content(source):
             print(f"警告：找不到本地檔案 {source}")
             return []
 
+def clean_domain(domain):
+    """清理域名開頭的 Clash 通配符，例如 +.aaplimg.com -> aaplimg.com"""
+    domain = domain.strip()
+    if domain.startswith("+."):
+        domain = domain[2:]
+    elif domain.startswith("."):
+        domain = domain[1:]
+    return domain
+
 def parse_line(line):
     """清洗 Clash DOMAIN 語法，轉成 geosite 格式"""
     line = line.strip()
@@ -40,7 +49,7 @@ def parse_line(line):
     if ',' in line:
         parts = [p.strip() for p in line.split(',')]
         rule_type = parts[0].upper()
-        domain = parts[1]
+        domain = clean_domain(parts[1])
         
         if rule_type in ['DOMAIN-SUFFIX', 'HOST-SUFFIX']:
             return domain                       # geosite 預設 domain 包含子網域
@@ -51,8 +60,9 @@ def parse_line(line):
         elif rule_type in ['REGEXP', 'URL-REGEX']:
             return f"regexp:{domain}"           # 正則
     else:
+        # 如果是純域名列表（例如帶有 +. 或 . 的 line）
         if not line.startswith('payload'):
-            return line
+            return clean_domain(line)
             
     return None
 
