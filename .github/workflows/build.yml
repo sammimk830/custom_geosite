@@ -1,0 +1,52 @@
+name: Build Custom geosite.dat
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  schedule:
+    - cron: '0 20 * * *'  # 每天 UTC 20:00 (香港時間早上 04:00) 自動重編
+  workflow_dispatch:      # 支援在 GitHub 網頁手動觸發按鈕
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write     # 確保 GitHub Action 有權限建立 Release
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: Download & Merge Rules
+        run: python convert.py
+
+      - name: Download v2fly compiler and compile
+        run: |
+          git clone --depth 1 https://github.com/v2fly/domain-list-community.git compiler
+          cp -r data compiler/
+          cd compiler
+          go run main.go
+          mv geosite.dat ../geosite.dat
+
+      - name: Release geosite.dat
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: release
+          name: "Custom geosite.dat"
+          body: "Auto-built geosite.dat from custom and remote sources."
+          draft: false
+          prerelease: false
+          files: geosite.dat
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
