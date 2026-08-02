@@ -49,7 +49,7 @@
       "exclude_rules": []
     },
 
-    "lan": {
+    "mylan": {
       "urls": [
         "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Lan/Lan.yaml"
       ],
@@ -58,7 +58,7 @@
       "exclude_rules": []
     },
 
-    "apple": {
+    "myapple": {
       "urls": [
         "https://raw.githubusercontent.com/Accademia/Additional_Rule_For_Clash/refs/heads/main/Apple/Apple_Domain.yaml",
         "https://raw.githubusercontent.com/Accademia/Additional_Rule_For_Clash/refs/heads/main/AppleAI/AppleAI_Domain.yaml",
@@ -69,7 +69,7 @@
       "exclude_rules": []
     },
 
-    "cn": {
+    "mycn": {
       "urls": [
         "https://raw.githubusercontent.com/Accademia/Additional_Rule_For_Clash/refs/heads/main/China/China_Domain.yaml",
         "https://raw.githubusercontent.com/Accademia/Additional_Rule_For_Clash/refs/heads/main/GeositeCN/GeositeCN_Domain.yaml"
@@ -79,7 +79,7 @@
       "exclude_rules": []
     },
 
-    "microsoft": {
+    "mymicrosoft": {
       "urls": [
         "https://raw.githubusercontent.com/Accademia/Additional_Rule_For_Clash/refs/heads/main/MicrosoftAPPs/MicrosoftAPPs_Domain.yaml"
       ],
@@ -88,7 +88,7 @@
       "exclude_rules": []
     },
 
-    "dns": {
+    "mydns": {
       "urls": [
         {
           "url": "https://raw.githubusercontent.com/Accademia/Additional_Rule_For_Clash/refs/heads/main/GlobalDNS/GlobalDNS_Domain.yaml",
@@ -104,7 +104,7 @@
       "exclude_rules": []
     },
 
-    "ai": {
+    "myai": {
       "urls": [
         {
           "url": "https://raw.githubusercontent.com/Accademia/Additional_Rule_For_Clash/refs/heads/main/Gemini/Gemini_Domain.yaml",
@@ -113,6 +113,18 @@
         {
           "url": "https://raw.githubusercontent.com/Accademia/Additional_Rule_For_Clash/refs/heads/main/Grok/Grok_Domain.yaml",
           "attr": "grok"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/sammimk830/Private-Rules/refs/heads/main/Rules/Clash/OpenAIDomain.txt",
+          "attr": "openai"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/sammimk830/Private-Rules/refs/heads/main/Rules/Clash/ClaudeDomain.txt",
+          "attr": "claude"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/sammimk830/Private-Rules/refs/heads/main/Rules/Clash/PerplexityDomain.txt",
+          "attr": "perplexity"
         }
       ],
       "local_files": [],
