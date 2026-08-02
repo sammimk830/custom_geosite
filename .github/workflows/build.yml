@@ -50,6 +50,11 @@ jobs:
             mv geosite.dat ../geosite.dat
           fi
 
+      # 增加：產生 SHA256 校驗碼檔案
+      - name: Generate SHA256 Sum
+        run: |
+          sha256sum geosite.dat | awk '{print $1}' > geosite.dat.sha256sum
+
       - name: Release geosite.dat (Timestamp Tag)
         uses: softprops/action-gh-release@v2
         with:
@@ -58,7 +63,10 @@ jobs:
           body: "Auto-built geosite.dat at ${{ steps.time.outputs.TIMESTAMP }}"
           draft: false
           prerelease: false
-          files: geosite.dat
+          make_latest: false
+          files: |
+            geosite.dat
+            geosite.dat.sha256sum
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -70,6 +78,9 @@ jobs:
           body: "Always points to the latest geosite.dat"
           draft: false
           prerelease: false
-          files: geosite.dat
+          make_latest: true
+          files: |
+            geosite.dat
+            geosite.dat.sha256sum
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
