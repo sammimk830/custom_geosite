@@ -1,44 +1,123 @@
 {
-  "mydirect": [
-    "https://github.com/sammimk830/Private-Rules/raw/main/Rules/Clash/DirectDomain.txt",
-    "rules/my-custom.yaml"
-  ],
-  "myproxy": [
-    "https://github.com/sammimk830/Private-Rules/raw/main/Rules/Clash/ProxyDomain.txt"
-  ],
-  "lan": [
-    "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Lan/Lan.yaml"
-  ],
-  "apple":[
-    "https://raw.githubusercontent.com/Accademia/Additional_Rule_For_Clash/refs/heads/main/Apple/Apple_Domain.yaml",
-    "https://raw.githubusercontent.com/Accademia/Additional_Rule_For_Clash/refs/heads/main/AppleAI/AppleAI_Domain.yaml",
-    "https://raw.githubusercontent.com/Accademia/Additional_Rule_For_Clash/refs/heads/main/AppleNews/AppleNews_Domain.yaml"
-  ],
-  "cn":[
-    "https://raw.githubusercontent.com/Accademia/Additional_Rule_For_Clash/refs/heads/main/China/China_Domain.yaml",
-    "https://raw.githubusercontent.com/Accademia/Additional_Rule_For_Clash/refs/heads/main/GeositeCN/GeositeCN_Domain.yaml"
-  ],
-  "microsoft":[
-    "https://raw.githubusercontent.com/Accademia/Additional_Rule_For_Clash/refs/heads/main/MicrosoftAPPs/MicrosoftAPPs_Domain.yaml"
-  ],
-  "dns":[
-    {
-      "url": "https://raw.githubusercontent.com/Accademia/Additional_Rule_For_Clash/refs/heads/main/GlobalDNS/GlobalDNS_Domain.yaml",
-      "attr": "global"
+  // "_sample_comment": {
+  //   "### 示範樣板範例（日後新增 Category 時可直接複製以下結構） ###": "==================================================",
+  //   "_usage_notes": [
+  //     "# 1. urls: 可放普通網址字串，或帶屬性標籤的物件 {'url': '...', 'attr': '標籤名'}",
+  //     "# 2. local_files: 本地 rules/ 資料夾下的檔案路徑 (例如 rules/my-rules.yaml)",
+  //     "# 3. inline_rules: 直接寫在 JSON 內的規則 (例如 full:google.com 或 domain.com @myattr)",
+  //     "# 4. exclude_rules: 強制剔除的黑名單域名 (不論來自遠端或本地都會被剪掉)"
+  //   ],
+  //   "_template_example": {
+  //     "sample_category_name": {
+  //       "urls": [
+  //         "https://example.com/rules.yaml",
+  //         {
+  //           "url": "https://example.com/sub_rules.yaml",
+  //           "attr": "sub_tag_name"
+  //         }
+  //       ],
+  //       "local_files": [
+  //         "rules/my-custom-rules.yaml"
+  //       ],
+  //       "inline_rules": [
+  //         "full:internal-service.local",
+  //         "DOMAIN-SUFFIX,custom-ai.com @myai"
+  //       ],
+  //       "exclude_rules": [
+  //         "unwanted-ad-domain.com"
+  //       ]
+  //     }
+  //   }
+  // },
+
+  "categories": {
+    "mydirect": {
+      "urls": [
+        "https://github.com/sammimk830/Private-Rules/raw/main/Rules/Clash/DirectDomain.txt"
+      ],
+      "local_files": [],
+      "inline_rules": [],
+      "exclude_rules": []
     },
-    {
-      "url": "https://raw.githubusercontent.com/Accademia/Additional_Rule_For_Clash/refs/heads/main/ChinaDNS/ChinaDNS_Domain.yaml",
-      "attr": "china"
-    }
-  ],
-  "ai": [
-    {
-      "url": "https://raw.githubusercontent.com/Accademia/Additional_Rule_For_Clash/refs/heads/main/Gemini/Gemini_Domain.yaml",
-      "attr": "gemini"
+
+    "myproxy": {
+      "urls": [
+        "https://github.com/sammimk830/Private-Rules/raw/main/Rules/Clash/ProxyDomain.txt"
+      ],
+      "local_files": [],
+      "inline_rules": [],
+      "exclude_rules": []
     },
-    {
-      "url": "https://raw.githubusercontent.com/Accademia/Additional_Rule_For_Clash/refs/heads/main/Grok/Grok_Domain.yaml",
-      "attr": "grok"
+
+    "lan": {
+      "urls": [
+        "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Lan/Lan.yaml"
+      ],
+      "local_files": [],
+      "inline_rules": [],
+      "exclude_rules": []
+    },
+
+    "apple": {
+      "urls": [
+        "https://raw.githubusercontent.com/Accademia/Additional_Rule_For_Clash/refs/heads/main/Apple/Apple_Domain.yaml",
+        "https://raw.githubusercontent.com/Accademia/Additional_Rule_For_Clash/refs/heads/main/AppleAI/AppleAI_Domain.yaml",
+        "https://raw.githubusercontent.com/Accademia/Additional_Rule_For_Clash/refs/heads/main/AppleNews/AppleNews_Domain.yaml"
+      ],
+      "local_files": [],
+      "inline_rules": [],
+      "exclude_rules": []
+    },
+
+    "cn": {
+      "urls": [
+        "https://raw.githubusercontent.com/Accademia/Additional_Rule_For_Clash/refs/heads/main/China/China_Domain.yaml",
+        "https://raw.githubusercontent.com/Accademia/Additional_Rule_For_Clash/refs/heads/main/GeositeCN/GeositeCN_Domain.yaml"
+      ],
+      "local_files": [],
+      "inline_rules": [],
+      "exclude_rules": []
+    },
+
+    "microsoft": {
+      "urls": [
+        "https://raw.githubusercontent.com/Accademia/Additional_Rule_For_Clash/refs/heads/main/MicrosoftAPPs/MicrosoftAPPs_Domain.yaml"
+      ],
+      "local_files": [],
+      "inline_rules": [],
+      "exclude_rules": []
+    },
+
+    "dns": {
+      "urls": [
+        {
+          "url": "https://raw.githubusercontent.com/Accademia/Additional_Rule_For_Clash/refs/heads/main/GlobalDNS/GlobalDNS_Domain.yaml",
+          "attr": "global"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/Accademia/Additional_Rule_For_Clash/refs/heads/main/ChinaDNS/ChinaDNS_Domain.yaml",
+          "attr": "china"
+        }
+      ],
+      "local_files": [],
+      "inline_rules": [],
+      "exclude_rules": []
+    },
+
+    "ai": {
+      "urls": [
+        {
+          "url": "https://raw.githubusercontent.com/Accademia/Additional_Rule_For_Clash/refs/heads/main/Gemini/Gemini_Domain.yaml",
+          "attr": "gemini"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/Accademia/Additional_Rule_For_Clash/refs/heads/main/Grok/Grok_Domain.yaml",
+          "attr": "grok"
+        }
+      ],
+      "local_files": [],
+      "inline_rules": [],
+      "exclude_rules": []
     }
-  ]
+  }
 }
