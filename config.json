@@ -1,34 +1,34 @@
 {
-  // "_sample_comment": {
-  //   "### 示範樣板範例（日後新增 Category 時可直接複製以下結構） ###": "==================================================",
-  //   "_usage_notes": [
-  //     "# 1. urls: 可放普通網址字串，或帶屬性標籤的物件 {'url': '...', 'attr': '標籤名'}",
-  //     "# 2. local_files: 本地 rules/ 資料夾下的檔案路徑 (例如 rules/my-rules.yaml)",
-  //     "# 3. inline_rules: 直接寫在 JSON 內的規則 (例如 full:google.com 或 domain.com @myattr)",
-  //     "# 4. exclude_rules: 強制剔除的黑名單域名 (不論來自遠端或本地都會被剪掉)"
-  //   ],
-  //   "_template_example": {
-  //     "sample_category_name": {
-  //       "urls": [
-  //         "https://example.com/rules.yaml",
-  //         {
-  //           "url": "https://example.com/sub_rules.yaml",
-  //           "attr": "sub_tag_name"
-  //         }
-  //       ],
-  //       "local_files": [
-  //         "rules/my-custom-rules.yaml"
-  //       ],
-  //       "inline_rules": [
-  //         "full:internal-service.local",
-  //         "DOMAIN-SUFFIX,custom-ai.com @myai"
-  //       ],
-  //       "exclude_rules": [
-  //         "unwanted-ad-domain.com"
-  //       ]
-  //     }
-  //   }
-  // },
+  "_sample_comment": {
+    "### 示範樣板範例（日後新增 Category 時可直接複製以下結構） ###": "==================================================",
+    "_usage_notes": [
+      "# 1. urls: 可放普通網址字串，或帶屬性標籤的物件 {'url': '...', 'attr': '標籤名'}",
+      "# 2. local_files: 本地 rules/ 資料夾下的檔案路徑 (例如 rules/my-rules.yaml)",
+      "# 3. inline_rules: 直接寫在 JSON 內的規則 (例如 full:google.com 或 domain.com @myattr)",
+      "# 4. exclude_rules: 強制剔除的黑名單域名 (不論來自遠端或本地都會被剪掉)"
+    ],
+    "_template_example": {
+      "sample_category_name": {
+        "urls": [
+          "https://example.com/rules.yaml",
+          {
+            "url": "https://example.com/sub_rules.yaml",
+            "attr": "sub_tag_name"
+          }
+        ],
+        "local_files": [
+          "rules/my-custom-rules.yaml"
+        ],
+        "inline_rules": [
+          "full:internal-service.local",
+          "DOMAIN-SUFFIX,custom-ai.com @myai"
+        ],
+        "exclude_rules": [
+          "unwanted-ad-domain.com"
+        ]
+      }
+    }
+  },
 
   "categories": {
     "mydirect": {
