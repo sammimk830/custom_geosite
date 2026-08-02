@@ -6,8 +6,8 @@ on:
       - main
       - master
   schedule:
-    - cron: '0 20 * * *'  # 每天 UTC 20:00 (香港時間早上 04:00) 自動重編
-  workflow_dispatch:      # 支援在 GitHub 網頁手動觸發按鈕
+    - cron: '0 20 * * *'  # 每天香港時間 04:00 自動更新
+  workflow_dispatch:
 
 jobs:
   build:
@@ -27,6 +27,7 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: '1.22'
+          cache: false
 
       - name: Download & Merge Rules
         run: python convert.py
@@ -37,7 +38,11 @@ jobs:
           cp -r data compiler/
           cd compiler
           go run main.go
-          mv geosite.dat ../geosite.dat
+          if [ -f "dlc.dat" ]; then
+            mv dlc.dat ../geosite.dat
+          elif [ -f "geosite.dat" ]; then
+            mv geosite.dat ../geosite.dat
+          fi
 
       - name: Release geosite.dat
         uses: softprops/action-gh-release@v2
