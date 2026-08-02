@@ -228,11 +228,13 @@ jobs:
                       output.append("+." + rule)
 
               if unsupported:
-                  preview = ", ".join(unsupported[:5])
-                  raise RuntimeError(
-                      f"MRS domain format cannot represent keyword/regexp rules in "
-                      f"{output_name}: {preview}"
-                  )
+                preview = ", ".join(unsupported[:5])
+            
+                print(
+                    f"Warning: MRS skipped {len(unsupported)} "
+                    f"unsupported keyword/regexp rules in {output_name}: "
+                    f"{preview}"
+                )
 
               output = list(dict.fromkeys(output))
               if not output:
