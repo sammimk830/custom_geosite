@@ -6,26 +6,9 @@ import urllib.request
 # 建立 output 資料夾
 os.makedirs("data", exist_ok=True)
 
-def load_json_with_comments(filepath):
-    """讀取 config.json 並自動過濾 // 註解，讓 JSON 支援註解語法"""
-    cleaned_lines = []
-    with open(filepath, "r", encoding="utf-8") as f:
-        for line in f:
-            stripped = line.strip()
-            # 忽略純 // 註解行
-            if stripped.startswith("//"):
-                continue
-            # 切除行末的 // 註解 (但避免誤切 http:// 或 https://)
-            if "//" in line:
-                parts = line.split("//")
-                # 簡單判斷 // 是否出現在 URL 內部
-                if not any(p.rstrip().endswith(("http:", "https:")) for p in parts[:-1]):
-                    line = parts[0] + "\n"
-            cleaned_lines.append(line)
-    return json.loads("".join(cleaned_lines))
-
-# 載入配置文件
-config = load_json_with_comments("config.json")
+# 載入標準 config.json
+with open("config.json", "r", encoding="utf-8") as f:
+    config = json.load(f)
 
 def fetch_content(source):
     """判斷是網址還是本地檔案，並讀取內容"""
@@ -132,11 +115,11 @@ def parse_line(line, attr_tag=""):
     else:
         return f"{domain}{attr_str}"
 
-# 取得 categories 結構（同時向下相容舊版結構）
+# 取得 categories 結構（向下相容舊版結構）
 categories = config.get("categories", config)
 
 for tag, cat_data in categories.items():
-    # 自動忽略以 _ 開頭的說明 Key (如 _sample_comment)
+    # 自動忽略以 _ 開頭的說明 Key (例如 _sample_comment)
     if tag.startswith("_"):
         continue
 
