@@ -15,6 +15,7 @@
     "https://raw.githubusercontent.com/Accademia/Additional_Rule_For_Clash/refs/heads/main/AppleNews/AppleNews_Domain.yaml"
   ],
   "cn":[
+    "https://raw.githubusercontent.com/Accademia/Additional_Rule_For_Clash/refs/heads/main/China/China_Domain.yaml",
     "https://raw.githubusercontent.com/Accademia/Additional_Rule_For_Clash/refs/heads/main/GeositeCN/GeositeCN_Domain.yaml"
   ],
   "microsoft":[
