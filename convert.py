@@ -40,15 +40,28 @@ def clean_domain(domain):
     return domain
 
 def parse_line(line, attr_tag=""):
-    """清洗 Clash DOMAIN 語法，轉成 geosite 格式，並處理解析通配符 * 與 ?"""
+    """清洗 Clash DOMAIN 語法，移除行內註解，處理解析通配符 * 與 ?"""
     line = line.strip()
-    if not line or line.startswith(('#', '//', 'payload:')):
+    
+    # 1. 忽略整行都是註解或 YAML 結構標頭
+    if not line or line.startswith('#') or line.startswith('//') or line.startswith('payload:'):
         return None
     
-    # 清理 YAML / Clash 多餘符號
-    line = line.replace("'", "").replace('"', '').lstrip('- ').strip()
+    # 2. 先把行內註解 (# 或 // 後面的內容) 砍掉
+    if ' #' in line:
+        line = line.split(' #', 1)[0]
+    elif '//' in line:
+        line = line.split('//', 1)[0]
+        
+    line = line.strip()
+    if not line:
+        return None
+
+    # 3. 清理 YAML / Clash 多餘符號 (減號、單雙引號)
+    line = line.lstrip('- ').strip()
+    line = line.replace("'", "").replace('"', '').strip()
     
-    # 判斷是否原本就有自訂 @ 屬性 (例如 line 裡面自帶 @gemini)
+    # 4. 判斷是否原本就有自訂 @ 屬性 (例如 line 裡面自帶 @gemini)
     attr_str = f" @{attr_tag}" if attr_tag else ""
     if " @" in line:
         line, inline_attr = line.split(" @", 1)
@@ -57,22 +70,24 @@ def parse_line(line, attr_tag=""):
     rule_type = ""
     domain = line
 
+    # 5. 處理逗號分隔的 Clash 格式 (例如 DOMAIN-SUFFIX,example.com)
     if ',' in line:
         parts = [p.strip() for p in line.split(',')]
         rule_type = parts[0].upper()
         domain = parts[1]
 
-    # 強制清洗域名開頭
+    # 6. 強制清洗域名開頭 (+. 或 .)
     domain = clean_domain(domain)
 
-    if not domain:
+    if not domain or domain.startswith('payload'):
         return None
 
-    # 如果域名裡面帶有 * 或 ? 通配符 (例如 awsdns-cn-??.biz 或 colab.*)
+    # 7. 如果域名裡面帶有 * 或 ? 通配符 (例如 awsdns-cn-??.biz 或 colab.*)
     if '*' in domain or '?' in domain:
         regex_domain = domain.replace('.', r'\.').replace('*', '.*').replace('?', '.')
         return f"regexp:^{regex_domain}${attr_str}"
 
+    # 8. 輸出對應的 geosite 格式
     if rule_type in ['DOMAIN-SUFFIX', 'HOST-SUFFIX']:
         return f"{domain}{attr_str}"
     elif rule_type in ['DOMAIN', 'HOST']:
@@ -82,10 +97,7 @@ def parse_line(line, attr_tag=""):
     elif rule_type in ['REGEXP', 'URL-REGEX']:
         return f"regexp:{domain}{attr_str}"
     else:
-        if not domain.startswith('payload'):
-            return f"{domain}{attr_str}"
-            
-    return None
+        return f"{domain}{attr_str}"
 
 # 開始處理每個 Tag
 for tag, sources in config.items():
