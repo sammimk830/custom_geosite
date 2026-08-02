@@ -13,7 +13,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: write     # 確保 GitHub Action 有權限建立 Release
+      contents: write     # 確保有權限建立與發布 Release
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -28,6 +28,12 @@ jobs:
         with:
           go-version: '1.22'
           cache: false
+
+      - name: Get current timestamp (HKT / UTC+8)
+        id: time
+        run: |
+          # 取得 UTC+8 時間 (Format: YYYYMMDDHHMMSS)
+          echo "TIMESTAMP=$(TZ='Asia/Hong_Kong' date +'%Y%m%d%H%M%S')" >> $GITHUB_OUTPUT
 
       - name: Download & Merge Rules
         run: python convert.py
@@ -44,12 +50,24 @@ jobs:
             mv geosite.dat ../geosite.dat
           fi
 
-      - name: Release geosite.dat
+      - name: Release geosite.dat (Timestamp Tag)
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.time.outputs.TIMESTAMP }}
+          name: "${{ steps.time.outputs.TIMESTAMP }}"
+          body: "Auto-built geosite.dat at ${{ steps.time.outputs.TIMESTAMP }}"
+          draft: false
+          prerelease: false
+          files: geosite.dat
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update Latest Tag (For 固定訂閱網址)
         uses: softprops/action-gh-release@v2
         with:
           tag_name: release
-          name: "Custom geosite.dat"
-          body: "Auto-built geosite.dat from custom and remote sources."
+          name: "Latest Release"
+          body: "Always points to the latest geosite.dat"
           draft: false
           prerelease: false
           files: geosite.dat
