@@ -1,5 +1,6 @@
 import os
 import json
+import re
 import urllib.request
 
 # 建立 output 資料夾
@@ -38,7 +39,7 @@ def clean_domain(domain):
     return domain
 
 def parse_line(line, attr_tag=""):
-    """清洗 Clash DOMAIN 語法，轉成 geosite 格式，並視乎需要加上 @ 標籤"""
+    """清洗 Clash DOMAIN 語法，轉成 geosite 格式，並處理解析通配符 *"""
     line = line.strip()
     if not line or line.startswith(('#', '//', 'payload:')):
         return None
@@ -52,22 +53,33 @@ def parse_line(line, attr_tag=""):
         line, inline_attr = line.split(" @", 1)
         attr_str = f" @{inline_attr.strip()}"
 
+    rule_type = ""
+    domain = line
+
     if ',' in line:
         parts = [p.strip() for p in line.split(',')]
         rule_type = parts[0].upper()
-        domain = clean_domain(parts[1])
-        
-        if rule_type in ['DOMAIN-SUFFIX', 'HOST-SUFFIX']:
-            return f"{domain}{attr_str}"
-        elif rule_type in ['DOMAIN', 'HOST']:
-            return f"full:{domain}{attr_str}"
-        elif rule_type in ['DOMAIN-KEYWORD', 'HOST-KEYWORD']:
-            return f"keyword:{domain}{attr_str}"
-        elif rule_type in ['REGEXP', 'URL-REGEX']:
-            return f"regexp:{domain}{attr_str}"
+        domain = parts[1]
+
+    domain = clean_domain(domain)
+
+    # 如果域名裡面帶有 * 通配符 (例如 colab.*)
+    if '*' in domain:
+        # 將 colab.* 轉為正則表達式 ^colab\..*$
+        regex_domain = domain.replace('.', r'\.').replace('*', '.*')
+        return f"regexp:^{regex_domain}${attr_str}"
+
+    if rule_type in ['DOMAIN-SUFFIX', 'HOST-SUFFIX']:
+        return f"{domain}{attr_str}"
+    elif rule_type in ['DOMAIN', 'HOST']:
+        return f"full:{domain}{attr_str}"
+    elif rule_type in ['DOMAIN-KEYWORD', 'HOST-KEYWORD']:
+        return f"keyword:{domain}{attr_str}"
+    elif rule_type in ['REGEXP', 'URL-REGEX']:
+        return f"regexp:{domain}{attr_str}"
     else:
-        if not line.startswith('payload'):
-            return f"{clean_domain(line)}{attr_str}"
+        if not domain.startswith('payload'):
+            return f"{domain}{attr_str}"
             
     return None
 
@@ -75,7 +87,6 @@ def parse_line(line, attr_tag=""):
 for tag, sources in config.items():
     rules_set = set()
     for src_item in sources:
-        # 判斷是普通網址/檔案路徑，還是帶有 attr 的物件
         if isinstance(src_item, dict):
             src_url = src_item.get("url", "")
             attr_tag = src_item.get("attr", "")
