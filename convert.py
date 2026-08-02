@@ -39,7 +39,7 @@ def clean_domain(domain):
     return domain
 
 def parse_line(line, attr_tag=""):
-    """清洗 Clash DOMAIN 語法，轉成 geosite 格式，並處理解析通配符 *"""
+    """清洗 Clash DOMAIN 語法，轉成 geosite 格式，並處理解析通配符 * 與 ?"""
     line = line.strip()
     if not line or line.startswith(('#', '//', 'payload:')):
         return None
@@ -63,10 +63,10 @@ def parse_line(line, attr_tag=""):
 
     domain = clean_domain(domain)
 
-    # 如果域名裡面帶有 * 通配符 (例如 colab.*)
-    if '*' in domain:
-        # 將 colab.* 轉為正則表達式 ^colab\..*$
-        regex_domain = domain.replace('.', r'\.').replace('*', '.*')
+    # 如果域名裡面帶有 * 或 ? 通配符 (例如 awsdns-cn-??.biz 或 colab.*)
+    if '*' in domain or '?' in domain:
+        # 將 . 轉義為 \.，將 * 轉為 .*，將 ? 轉為 .
+        regex_domain = domain.replace('.', r'\.').replace('*', '.*').replace('?', '.')
         return f"regexp:^{regex_domain}${attr_str}"
 
     if rule_type in ['DOMAIN-SUFFIX', 'HOST-SUFFIX']:
