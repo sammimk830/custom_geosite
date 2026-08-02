@@ -7,7 +7,7 @@
     "https://github.com/sammimk830/Private-Rules/raw/main/Rules/Clash/ProxyDomain.txt"
   ],
   "lan": [
-    "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/gland.txt"
+    "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Lan/Lan.yaml"
   ],
   "apple":[
     "https://raw.githubusercontent.com/Accademia/Additional_Rule_For_Clash/refs/heads/main/Apple/Apple_Domain.yaml",
@@ -20,7 +20,24 @@
   "microsoft":[
     "https://raw.githubusercontent.com/Accademia/Additional_Rule_For_Clash/refs/heads/main/MicrosoftAPPs/MicrosoftAPPs_Domain.yaml"
   ],
-  "globaldns":[
-    "https://raw.githubusercontent.com/Accademia/Additional_Rule_For_Clash/refs/heads/main/GlobalDNS/GlobalDNS_Domain.yaml"
+  "dns":[
+    {
+      "url": "https://raw.githubusercontent.com/Accademia/Additional_Rule_For_Clash/refs/heads/main/GlobalDNS/GlobalDNS_Domain.yaml",
+      "attr": "global"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Accademia/Additional_Rule_For_Clash/refs/heads/main/ChinaDNS/ChinaDNS_Domain.yaml",
+      "attr": "china"
+    }
+  ],
+  "ai": [
+    {
+      "url": "https://raw.githubusercontent.com/Accademia/Additional_Rule_For_Clash/refs/heads/main/Gemini/Gemini_Domain.yaml",
+      "attr": "gemini"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Accademia/Additional_Rule_For_Clash/refs/heads/main/Grok/Grok_Domain.yaml",
+      "attr": "grok"
+    }
   ]
 }
