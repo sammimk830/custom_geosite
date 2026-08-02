@@ -141,6 +141,13 @@
       "mydirect",
       "myproxy",
       "mylan",
+      "mycn",
+      "mymicrosoft"
+    ],
+    "surge": [
+      "mydirect",
+      "myproxy",
+      "mylan",
       "myapple",
       "mycn",
       "mymicrosoft"
@@ -162,6 +169,20 @@
       ]
     },
     "mrs": {
+      "mydns": [
+        "global",
+        "china"
+      ],
+      "myai": [
+        "gemini",
+        "grok",
+        "openai",
+        "claude",
+        "perplexity",
+        "global"
+      ]
+    },
+    "surge": {
       "mydns": [
         "global",
         "china"
