@@ -39,15 +39,27 @@ def clean_domain(domain):
             domain = domain[1:]
     return domain
 
+def is_ip(string):
+    """檢查字串是否為 IPv4 / IPv6 / CIDR 網段"""
+    # 簡單匹配 IPv4/IPv6 與 CIDR 格式
+    ip_pattern = r'^([0-9]{1,3}\.){3}[0-9]{1,3}(/[0-9]{1,2})?$'
+    ip6_pattern = r'^([0-9a-fA-F:]+)(/[0-9]{1,3})?$'
+    
+    if re.match(ip_pattern, string):
+        return True
+    if ':' in string and re.match(ip6_pattern, string):
+        return True
+    return False
+
 def parse_line(line, attr_tag=""):
-    """清洗 Clash DOMAIN 語法，移除行內註解，處理解析通配符 * 與 ?"""
+    """清洗 Clash DOMAIN 語法，自動過濾 IP-CIDR，處理解析通配符 * 與 ?"""
     line = line.strip()
     
     # 1. 忽略整行都是註解或 YAML 結構標頭
     if not line or line.startswith('#') or line.startswith('//') or line.startswith('payload:'):
         return None
     
-    # 2. 先把行內註解 (# 或 // 後面的內容) 砍掉
+    # 2. 砍掉行內註解
     if ' #' in line:
         line = line.split(' #', 1)[0]
     elif '//' in line:
@@ -57,11 +69,11 @@ def parse_line(line, attr_tag=""):
     if not line:
         return None
 
-    # 3. 清理 YAML / Clash 多餘符號 (減號、單雙引號)
+    # 3. 清理 YAML / Clash 多餘符號
     line = line.lstrip('- ').strip()
     line = line.replace("'", "").replace('"', '').strip()
     
-    # 4. 判斷是否原本就有自訂 @ 屬性 (例如 line 裡面自帶 @gemini)
+    # 4. 判斷自訂 @ 屬性
     attr_str = f" @{attr_tag}" if attr_tag else ""
     if " @" in line:
         line, inline_attr = line.split(" @", 1)
@@ -70,24 +82,29 @@ def parse_line(line, attr_tag=""):
     rule_type = ""
     domain = line
 
-    # 5. 處理逗號分隔的 Clash 格式 (例如 DOMAIN-SUFFIX,example.com)
+    # 5. 處理逗號分隔的 Clash 格式
     if ',' in line:
         parts = [p.strip() for p in line.split(',')]
         rule_type = parts[0].upper()
         domain = parts[1]
 
-    # 6. 強制清洗域名開頭 (+. 或 .)
-    domain = clean_domain(domain)
-
-    if not domain or domain.startswith('payload'):
+    # 6. 過濾 IP 類型的規則 (IP-CIDR, IP-CIDR6, IP-ASN)
+    if rule_type in ['IP-CIDR', 'IP-CIDR6', 'IP-ASN', 'GEOIP']:
         return None
 
-    # 7. 如果域名裡面帶有 * 或 ? 通配符 (例如 awsdns-cn-??.biz 或 colab.*)
+    # 7. 強制清洗域名開頭 (+. 或 .)
+    domain = clean_domain(domain)
+
+    # 8. 再次檢查 domain 是否是純 IP 或 IP/CIDR，是的話直接丟棄
+    if not domain or domain.startswith('payload') or is_ip(domain):
+        return None
+
+    # 9. 處理解析通配符 * 與 ?
     if '*' in domain or '?' in domain:
         regex_domain = domain.replace('.', r'\.').replace('*', '.*').replace('?', '.')
         return f"regexp:^{regex_domain}${attr_str}"
 
-    # 8. 輸出對應的 geosite 格式
+    # 10. 輸出對應的 geosite 格式
     if rule_type in ['DOMAIN-SUFFIX', 'HOST-SUFFIX']:
         return f"{domain}{attr_str}"
     elif rule_type in ['DOMAIN', 'HOST']:
