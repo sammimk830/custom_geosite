@@ -29,7 +29,7 @@ def fetch_content(source):
             return []
 
 def clean_domain(domain):
-    """清理域名開頭的 Clash 通配符，例如 +.aaplimg.com -> aaplimg.com"""
+    """清理域名開頭的 Clash 通配符 (+. 或 .)"""
     domain = domain.strip()
     if domain.startswith("+."):
         domain = domain[2:]
@@ -37,42 +37,55 @@ def clean_domain(domain):
         domain = domain[1:]
     return domain
 
-def parse_line(line):
-    """清洗 Clash DOMAIN 語法，轉成 geosite 格式"""
+def parse_line(line, attr_tag=""):
+    """清洗 Clash DOMAIN 語法，轉成 geosite 格式，並視乎需要加上 @ 標籤"""
     line = line.strip()
     if not line or line.startswith(('#', '//', 'payload:')):
         return None
     
-    # 去除 YAML 符號與多餘空白
+    # 清理 YAML / Clash 多餘符號
     line = line.replace("'", "").replace('"', '').lstrip('- ').strip()
     
+    # 判斷是否原本就有自訂 @ 屬性 (例如 line 裡面自帶 @gemini)
+    attr_str = f" @{attr_tag}" if attr_tag else ""
+    if " @" in line:
+        line, inline_attr = line.split(" @", 1)
+        attr_str = f" @{inline_attr.strip()}"
+
     if ',' in line:
         parts = [p.strip() for p in line.split(',')]
         rule_type = parts[0].upper()
         domain = clean_domain(parts[1])
         
         if rule_type in ['DOMAIN-SUFFIX', 'HOST-SUFFIX']:
-            return domain                       # geosite 預設 domain 包含子網域
+            return f"{domain}{attr_str}"
         elif rule_type in ['DOMAIN', 'HOST']:
-            return f"full:{domain}"             # 完全匹配
+            return f"full:{domain}{attr_str}"
         elif rule_type in ['DOMAIN-KEYWORD', 'HOST-KEYWORD']:
-            return f"keyword:{domain}"          # 關鍵字
+            return f"keyword:{domain}{attr_str}"
         elif rule_type in ['REGEXP', 'URL-REGEX']:
-            return f"regexp:{domain}"           # 正則
+            return f"regexp:{domain}{attr_str}"
     else:
-        # 如果是純域名列表（例如帶有 +. 或 . 的 line）
         if not line.startswith('payload'):
-            return clean_domain(line)
+            return f"{clean_domain(line)}{attr_str}"
             
     return None
 
 # 開始處理每個 Tag
 for tag, sources in config.items():
-    rules_set = set()  # 使用 set 自動去重
-    for src in sources:
-        lines = fetch_content(src)
+    rules_set = set()
+    for src_item in sources:
+        # 判斷是普通網址/檔案路徑，還是帶有 attr 的物件
+        if isinstance(src_item, dict):
+            src_url = src_item.get("url", "")
+            attr_tag = src_item.get("attr", "")
+        else:
+            src_url = src_item
+            attr_tag = ""
+
+        lines = fetch_content(src_url)
         for line in lines:
-            parsed = parse_line(line)
+            parsed = parse_line(line, attr_tag)
             if parsed:
                 rules_set.add(parsed)
                 
@@ -82,4 +95,4 @@ for tag, sources in config.items():
         
     print(f"Tag [{tag}] 處理完成，共 {len(rules_set)} 條不重複域名。")
 
-print("所有規則轉換完成！")
+print("\n所有規則轉換完成！")
