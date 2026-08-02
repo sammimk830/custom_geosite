@@ -6,14 +6,20 @@ on:
       - main
       - master
   schedule:
-    - cron: '0 20 * * *'  # 每天香港時間 04:00 自動更新
+    - cron: "0 20 * * *"
   workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-custom-geosite
+  cancel-in-progress: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write     # 確保有權限建立與發布 Release
+
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -21,66 +27,449 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.x'
+          python-version: "3.x"
 
       - name: Setup Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
-          go-version: '1.22'
+          go-version: "stable"
           cache: false
 
-      - name: Get current timestamp (HKT / UTC+8)
+      - name: Get current timestamp (HKT)
         id: time
+        shell: bash
         run: |
-          # 取得 UTC+8 時間 (Format: YYYYMMDDHHMMSS)
-          echo "TIMESTAMP=$(TZ='Asia/Hong_Kong' date +'%Y%m%d%H%M%S')" >> $GITHUB_OUTPUT
+          set -euo pipefail
+          echo "TIMESTAMP=$(TZ='Asia/Hong_Kong' date +'%Y%m%d%H%M%S')" >> "$GITHUB_OUTPUT"
 
-      - name: Download & Merge Rules
-        run: python convert.py
-
-      - name: Download v2fly compiler and compile
+      - name: Download and merge rules
+        shell: bash
         run: |
-          git clone --depth 1 https://github.com/v2fly/domain-list-community.git compiler
-          cp -r data compiler/
-          cd compiler
-          go run main.go
-          if [ -f "dlc.dat" ]; then
-            mv dlc.dat ../geosite.dat
-          elif [ -f "geosite.dat" ]; then
-            mv geosite.dat ../geosite.dat
+          set -euo pipefail
+          python convert.py
+
+          if [ ! -d data ]; then
+            echo "Error: convert.py did not create data directory."
+            exit 1
           fi
 
-      # 增加：產生 SHA256 校驗碼檔案
-      - name: Generate SHA256 Sum
-        run: |
-          sha256sum geosite.dat | awk '{print $1}' > geosite.dat.sha256sum
+          if [ -z "$(find data -maxdepth 1 -type f -print -quit)" ]; then
+            echo "Error: no geosite source files were generated."
+            exit 1
+          fi
 
-      - name: Release geosite.dat (Timestamp Tag)
+          find data -maxdepth 1 -type f -print | sort
+
+      - name: Build full geosite.dat
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          rm -rf compiler
+          git clone --depth 1 https://github.com/v2fly/domain-list-community.git compiler
+
+          rm -rf compiler/data
+          cp -r data compiler/data
+
+          cd compiler
+          go run main.go
+
+          if [ -f dlc.dat ]; then
+            mv dlc.dat ../geosite.dat
+          elif [ -f geosite.dat ]; then
+            mv geosite.dat ../geosite.dat
+          else
+            echo "Error: geosite.dat was not generated."
+            exit 1
+          fi
+
+      - name: Verify geosite.dat
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [ ! -s geosite.dat ]; then
+            echo "Error: geosite.dat is missing or empty."
+            exit 1
+          fi
+
+          ls -lh geosite.dat
+          sha256sum geosite.dat | tee geosite.dat.sha256sum
+
+      - name: Prepare selected SRS and MRS sources
+        id: rulesets
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          rm -rf ruleset-source
+          mkdir -p ruleset-source/srs ruleset-source/mrs
+
+          python <<'PY'
+          import json
+          import os
+          import re
+          from pathlib import Path
+
+          config = json.loads(Path("config.json").read_text(encoding="utf-8"))
+          outputs = config.get("ruleset_outputs", {}) or {}
+          attr_outputs = config.get("ruleset_attr_outputs", {}) or {}
+
+          if not isinstance(outputs, dict):
+              raise TypeError("ruleset_outputs must be an object")
+          if not isinstance(attr_outputs, dict):
+              raise TypeError("ruleset_attr_outputs must be an object")
+
+          data_dir = Path("data")
+          srs_dir = Path("ruleset-source/srs")
+          mrs_dir = Path("ruleset-source/mrs")
+
+          def clean_name(value):
+              value = str(value).strip().lower()
+              if not re.fullmatch(r"[a-z0-9_-]+", value):
+                  raise ValueError(f"Invalid tag or attr name: {value}")
+              return value
+
+          def clean_list(value, field):
+              if value is None:
+                  return []
+              if not isinstance(value, list):
+                  raise TypeError(f"{field} must be an array")
+              return list(dict.fromkeys(clean_name(item) for item in value))
+
+          def clean_map(value, field):
+              if value is None:
+                  return {}
+              if not isinstance(value, dict):
+                  raise TypeError(f"{field} must be an object")
+              return {
+                  clean_name(tag): clean_list(attrs, f"{field}.{tag}")
+                  for tag, attrs in value.items()
+              }
+
+          srs_tags = clean_list(outputs.get("srs", []), "ruleset_outputs.srs")
+          mrs_tags = clean_list(outputs.get("mrs", []), "ruleset_outputs.mrs")
+          srs_attrs = clean_map(attr_outputs.get("srs", {}), "ruleset_attr_outputs.srs")
+          mrs_attrs = clean_map(attr_outputs.get("mrs", {}), "ruleset_attr_outputs.mrs")
+
+          def load_rules(tag, required_attr=None):
+              source = data_dir / tag
+              if not source.is_file():
+                  raise FileNotFoundError(f"Missing geosite category: {tag}")
+
+              rules = []
+              for raw_line in source.read_text(encoding="utf-8", errors="ignore").splitlines():
+                  line = raw_line.strip()
+                  if not line or line.startswith("#"):
+                      continue
+
+                  parts = line.split()
+                  rule = parts[0]
+                  attrs = {
+                      part[1:].lower()
+                      for part in parts[1:]
+                      if part.startswith("@") and len(part) > 1
+                  }
+
+                  if required_attr and required_attr not in attrs:
+                      continue
+
+                  rules.append(rule)
+
+              rules = list(dict.fromkeys(rules))
+              if not rules:
+                  suffix = f"@{required_attr}" if required_attr else ""
+                  raise RuntimeError(f"No rules found for {tag}{suffix}")
+              return rules
+
+          def build_srs(rules):
+              result = {
+                  "domain": [],
+                  "domain_suffix": [],
+                  "domain_keyword": [],
+                  "domain_regex": [],
+              }
+
+              for rule in rules:
+                  if rule.startswith("full:"):
+                      result["domain"].append(rule[5:])
+                  elif rule.startswith("keyword:"):
+                      result["domain_keyword"].append(rule[8:])
+                  elif rule.startswith("regexp:"):
+                      result["domain_regex"].append(rule[7:])
+                  elif rule.startswith("domain:"):
+                      result["domain_suffix"].append(rule[7:])
+                  else:
+                      result["domain_suffix"].append(rule)
+
+              payload = {
+                  key: list(dict.fromkeys(values))
+                  for key, values in result.items()
+                  if values
+              }
+
+              return {
+                  "version": 2,
+                  "rules": [payload],
+              }
+
+          def build_mrs_text(rules, output_name):
+              output = []
+              unsupported = []
+
+              for rule in rules:
+                  if rule.startswith("full:"):
+                      output.append(rule[5:])
+                  elif rule.startswith("domain:"):
+                      output.append("+." + rule[7:])
+                  elif rule.startswith("keyword:") or rule.startswith("regexp:"):
+                      unsupported.append(rule)
+                  else:
+                      output.append("+." + rule)
+
+              if unsupported:
+                  preview = ", ".join(unsupported[:5])
+                  raise RuntimeError(
+                      f"MRS domain format cannot represent keyword/regexp rules in "
+                      f"{output_name}: {preview}"
+                  )
+
+              output = list(dict.fromkeys(output))
+              if not output:
+                  raise RuntimeError(f"No MRS-compatible rules for {output_name}")
+              return output
+
+          srs_count = 0
+          mrs_count = 0
+
+          def write_srs(name, rules):
+              path = srs_dir / f"{name}.json"
+              path.write_text(
+                  json.dumps(build_srs(rules), ensure_ascii=False, indent=2) + "\n",
+                  encoding="utf-8",
+              )
+              print(f"SRS source: {name} ({len(rules)} rules)")
+
+          def write_mrs(name, rules):
+              lines = build_mrs_text(rules, name)
+              path = mrs_dir / f"{name}.txt"
+              path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+              print(f"MRS source: {name} ({len(lines)} rules)")
+
+          for tag in srs_tags:
+              write_srs(tag, load_rules(tag))
+              srs_count += 1
+
+          for tag, attrs in srs_attrs.items():
+              for attr in attrs:
+                  write_srs(f"{tag}-{attr}", load_rules(tag, attr))
+                  srs_count += 1
+
+          for tag in mrs_tags:
+              write_mrs(tag, load_rules(tag))
+              mrs_count += 1
+
+          for tag, attrs in mrs_attrs.items():
+              for attr in attrs:
+                  write_mrs(f"{tag}-{attr}", load_rules(tag, attr))
+                  mrs_count += 1
+
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
+              output.write(f"srs_count={srs_count}\n")
+              output.write(f"mrs_count={mrs_count}\n")
+          PY
+
+      - name: Install sing-box
+        if: steps.rulesets.outputs.srs_count != '0'
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          URL="$(python <<'PY'
+          import json
+          import urllib.request
+
+          request = urllib.request.Request(
+              "https://api.github.com/repos/SagerNet/sing-box/releases/latest",
+              headers={"User-Agent": "custom-geosite-builder"},
+          )
+          with urllib.request.urlopen(request, timeout=60) as response:
+              release = json.load(response)
+
+          for asset in release.get("assets", []):
+              name = asset.get("name", "")
+              if "linux-amd64" in name and name.endswith(".tar.gz"):
+                  print(asset["browser_download_url"])
+                  break
+          else:
+              raise RuntimeError("Cannot find sing-box linux-amd64 asset")
+          PY
+          )"
+
+          curl -fL "$URL" -o sing-box.tar.gz
+          rm -rf sing-box-extract
+          mkdir sing-box-extract
+          tar -xzf sing-box.tar.gz -C sing-box-extract
+
+          BIN="$(find sing-box-extract -type f -name sing-box -print -quit)"
+          sudo install -m 0755 "$BIN" /usr/local/bin/sing-box
+          sing-box version
+
+      - name: Compile selected SRS files
+        if: steps.rulesets.outputs.srs_count != '0'
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          rm -rf srs
+          mkdir srs
+
+          for source in ruleset-source/srs/*.json; do
+            [ -f "$source" ] || continue
+            tag="$(basename "$source" .json)"
+            sing-box rule-set compile --output "srs/${tag}.srs" "$source"
+            test -s "srs/${tag}.srs"
+          done
+
+      - name: Install Mihomo
+        if: steps.rulesets.outputs.mrs_count != '0'
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          URL="$(python <<'PY'
+          import json
+          import urllib.request
+
+          request = urllib.request.Request(
+              "https://api.github.com/repos/MetaCubeX/mihomo/releases/latest",
+              headers={"User-Agent": "custom-geosite-builder"},
+          )
+          with urllib.request.urlopen(request, timeout=60) as response:
+              release = json.load(response)
+
+          candidates = []
+          for asset in release.get("assets", []):
+              name = asset.get("name", "").lower()
+              if "linux-amd64" not in name or not name.endswith(".gz"):
+                  continue
+              if any(x in name for x in ("compatible", "go120", "musl", ".deb", ".rpm")):
+                  continue
+              candidates.append(asset)
+
+          if not candidates:
+              raise RuntimeError("Cannot find Mihomo linux-amd64 asset")
+
+          candidates.sort(key=lambda item: len(item["name"]))
+          print(candidates[0]["browser_download_url"])
+          PY
+          )"
+
+          curl -fL "$URL" -o mihomo.gz
+          gzip -dc mihomo.gz > mihomo
+          chmod +x mihomo
+          sudo install -m 0755 mihomo /usr/local/bin/mihomo
+          mihomo -v
+
+      - name: Compile selected MRS files
+        if: steps.rulesets.outputs.mrs_count != '0'
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          rm -rf mrs
+          mkdir mrs
+
+          for source in ruleset-source/mrs/*.txt; do
+            [ -f "$source" ] || continue
+            tag="$(basename "$source" .txt)"
+            mihomo convert-ruleset domain text "$source" "mrs/${tag}.mrs"
+            test -s "mrs/${tag}.mrs"
+          done
+
+      - name: Verify rule-set outputs
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          EXPECTED_SRS="${{ steps.rulesets.outputs.srs_count }}"
+          EXPECTED_MRS="${{ steps.rulesets.outputs.mrs_count }}"
+
+          ACTUAL_SRS=0
+          ACTUAL_MRS=0
+
+          if [ -d srs ]; then
+            ACTUAL_SRS="$(find srs -maxdepth 1 -type f -name '*.srs' | wc -l)"
+          fi
+
+          if [ -d mrs ]; then
+            ACTUAL_MRS="$(find mrs -maxdepth 1 -type f -name '*.mrs' | wc -l)"
+          fi
+
+          echo "SRS: ${ACTUAL_SRS}/${EXPECTED_SRS}"
+          echo "MRS: ${ACTUAL_MRS}/${EXPECTED_MRS}"
+
+          [ "$ACTUAL_SRS" -eq "$EXPECTED_SRS" ]
+          [ "$ACTUAL_MRS" -eq "$EXPECTED_MRS" ]
+
+      - name: Generate rule-set checksums
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          rm -f rulesets.sha256sum
+
+          find srs mrs \
+            -maxdepth 1 \
+            -type f \
+            \( -name '*.srs' -o -name '*.mrs' \) \
+            -print0 2>/dev/null \
+            | sort -z \
+            | xargs -0 -r sha256sum \
+            > rulesets.sha256sum
+
+          if [ ! -s rulesets.sha256sum ]; then
+            echo "No SRS or MRS outputs configured." > rulesets.sha256sum
+          fi
+
+      - name: Release files with timestamp
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.time.outputs.TIMESTAMP }}
-          name: "${{ steps.time.outputs.TIMESTAMP }}"
-          body: "Auto-built geosite.dat at ${{ steps.time.outputs.TIMESTAMP }}"
+          name: ${{ steps.time.outputs.TIMESTAMP }}
+          body: |
+            Auto-built custom geosite.dat and selected rule sets.
+
+            Build time: ${{ steps.time.outputs.TIMESTAMP }} HKT
           draft: false
           prerelease: false
           make_latest: false
           files: |
             geosite.dat
             geosite.dat.sha256sum
+            rulesets.sha256sum
+            srs/*.srs
+            mrs/*.mrs
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Update Latest Tag (For 固定訂閱網址)
+      - name: Update fixed release tag
         uses: softprops/action-gh-release@v2
         with:
           tag_name: release
-          name: "Latest Release"
-          body: "Always points to the latest geosite.dat"
+          name: Latest Release
+          body: |
+            Always contains the latest custom geosite.dat and selected rule sets.
+
+            Build time: ${{ steps.time.outputs.TIMESTAMP }} HKT
           draft: false
           prerelease: false
           make_latest: true
           files: |
             geosite.dat
             geosite.dat.sha256sum
+            rulesets.sha256sum
+            srs/*.srs
+            mrs/*.mrs
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
