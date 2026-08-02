@@ -30,12 +30,13 @@ def fetch_content(source):
             return []
 
 def clean_domain(domain):
-    """清理域名開頭的 Clash 通配符 (+. 或 .)"""
+    """強制清理域名開頭的 Clash/AdGuard 前綴 (+. 或 .)"""
     domain = domain.strip()
-    if domain.startswith("+."):
-        domain = domain[2:]
-    elif domain.startswith("."):
-        domain = domain[1:]
+    while domain.startswith("+.") or domain.startswith("."):
+        if domain.startswith("+."):
+            domain = domain[2:]
+        elif domain.startswith("."):
+            domain = domain[1:]
     return domain
 
 def parse_line(line, attr_tag=""):
@@ -61,11 +62,14 @@ def parse_line(line, attr_tag=""):
         rule_type = parts[0].upper()
         domain = parts[1]
 
+    # 強制清洗域名開頭
     domain = clean_domain(domain)
+
+    if not domain:
+        return None
 
     # 如果域名裡面帶有 * 或 ? 通配符 (例如 awsdns-cn-??.biz 或 colab.*)
     if '*' in domain or '?' in domain:
-        # 將 . 轉義為 \.，將 * 轉為 .*，將 ? 轉為 .
         regex_domain = domain.replace('.', r'\.').replace('*', '.*').replace('?', '.')
         return f"regexp:^{regex_domain}${attr_str}"
 
