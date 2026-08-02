@@ -125,6 +125,10 @@
         {
           "url": "https://raw.githubusercontent.com/sammimk830/Private-Rules/refs/heads/main/Rules/Clash/PerplexityDomain.txt",
           "attr": "perplexity"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/refs/heads/master/Clash/Ruleset/AI.list",
+          "attr": "global"
         }
       ],
       "local_files": [],
