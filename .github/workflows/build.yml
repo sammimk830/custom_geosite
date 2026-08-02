@@ -96,14 +96,14 @@ jobs:
           ls -lh geosite.dat
           sha256sum geosite.dat | tee geosite.dat.sha256sum
 
-      - name: Prepare selected SRS and MRS sources
+      - name: Prepare selected SRS, MRS and Surge sources
         id: rulesets
         shell: bash
         run: |
           set -euo pipefail
 
           rm -rf ruleset-source
-          mkdir -p ruleset-source/srs ruleset-source/mrs
+          mkdir -p ruleset-source/srs ruleset-source/mrs ruleset-source/surge
 
           python <<'PY'
           import json
@@ -123,6 +123,7 @@ jobs:
           data_dir = Path("data")
           srs_dir = Path("ruleset-source/srs")
           mrs_dir = Path("ruleset-source/mrs")
+          surge_dir = Path("ruleset-source/surge")
 
           def clean_name(value):
               value = str(value).strip().lower()
@@ -149,8 +150,10 @@ jobs:
 
           srs_tags = clean_list(outputs.get("srs", []), "ruleset_outputs.srs")
           mrs_tags = clean_list(outputs.get("mrs", []), "ruleset_outputs.mrs")
+          surge_tags = clean_list(outputs.get("surge", []), "ruleset_outputs.surge")
           srs_attrs = clean_map(attr_outputs.get("srs", {}), "ruleset_attr_outputs.srs")
           mrs_attrs = clean_map(attr_outputs.get("mrs", {}), "ruleset_attr_outputs.mrs")
+          surge_attrs = clean_map(attr_outputs.get("surge", {}), "ruleset_attr_outputs.surge")
 
           def load_rules(tag, required_attr=None):
               source = data_dir / tag
@@ -241,8 +244,50 @@ jobs:
                   raise RuntimeError(f"No MRS-compatible rules for {output_name}")
               return output
 
+          def build_surge_text(rules, output_name):
+              output = []
+              unsupported = []
+
+              for rule in rules:
+                  if rule.startswith("full:"):
+                      value = rule[5:].strip()
+                      if value:
+                          output.append("DOMAIN," + value)
+                  elif rule.startswith("domain:"):
+                      value = rule[7:].strip()
+                      if value:
+                          output.append("DOMAIN-SUFFIX," + value)
+                  elif rule.startswith("keyword:"):
+                      value = rule[8:].strip()
+                      if value:
+                          output.append("DOMAIN-KEYWORD," + value)
+                  elif rule.startswith("regexp:"):
+                      unsupported.append(rule)
+                  else:
+                      value = rule.strip()
+                      if value:
+                          output.append("DOMAIN-SUFFIX," + value)
+
+              if unsupported:
+                  preview = ", ".join(unsupported[:5])
+                  print(
+                      f"Warning: Surge skipped {len(unsupported)} "
+                      f"unsupported regexp rules in {output_name}: "
+                      f"{preview}"
+                  )
+
+              output = list(dict.fromkeys(output))
+
+              if not output:
+                  raise RuntimeError(
+                      f"No Surge-compatible rules for {output_name}"
+                  )
+
+              return output
+
           srs_count = 0
           mrs_count = 0
+          surge_count = 0
 
           def write_srs(name, rules):
               path = srs_dir / f"{name}.json"
@@ -257,6 +302,12 @@ jobs:
               path = mrs_dir / f"{name}.txt"
               path.write_text("\n".join(lines) + "\n", encoding="utf-8")
               print(f"MRS source: {name} ({len(lines)} rules)")
+
+          def write_surge(name, rules):
+              lines = build_surge_text(rules, name)
+              path = surge_dir / f"{name}.list"
+              path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+              print(f"Surge source: {name} ({len(lines)} rules)")
 
           for tag in srs_tags:
               write_srs(tag, load_rules(tag))
@@ -276,9 +327,19 @@ jobs:
                   write_mrs(f"{tag}-{attr}", load_rules(tag, attr))
                   mrs_count += 1
 
+          for tag in surge_tags:
+              write_surge(tag, load_rules(tag))
+              surge_count += 1
+
+          for tag, attrs in surge_attrs.items():
+              for attr in attrs:
+                  write_surge(f"{tag}-{attr}", load_rules(tag, attr))
+                  surge_count += 1
+
           with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
               output.write(f"srs_count={srs_count}\n")
               output.write(f"mrs_count={mrs_count}\n")
+              output.write(f"surge_count={surge_count}\n")
           PY
 
       - name: Install sing-box
@@ -389,6 +450,21 @@ jobs:
             test -s "mrs/${tag}.mrs"
           done
 
+      - name: Build selected Surge files
+        if: steps.rulesets.outputs.surge_count != '0'
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          rm -rf surge
+          mkdir surge
+
+          for source in ruleset-source/surge/*.list; do
+            [ -f "$source" ] || continue
+            cp "$source" surge/
+            test -s "surge/$(basename "$source")"
+          done
+
       - name: Verify rule-set outputs
         shell: bash
         run: |
@@ -396,9 +472,11 @@ jobs:
 
           EXPECTED_SRS="${{ steps.rulesets.outputs.srs_count }}"
           EXPECTED_MRS="${{ steps.rulesets.outputs.mrs_count }}"
+          EXPECTED_SURGE="${{ steps.rulesets.outputs.surge_count }}"
 
           ACTUAL_SRS=0
           ACTUAL_MRS=0
+          ACTUAL_SURGE=0
 
           if [ -d srs ]; then
             ACTUAL_SRS="$(find srs -maxdepth 1 -type f -name '*.srs' | wc -l)"
@@ -408,11 +486,17 @@ jobs:
             ACTUAL_MRS="$(find mrs -maxdepth 1 -type f -name '*.mrs' | wc -l)"
           fi
 
+          if [ -d surge ]; then
+            ACTUAL_SURGE="$(find surge -maxdepth 1 -type f -name '*.list' | wc -l)"
+          fi
+
           echo "SRS: ${ACTUAL_SRS}/${EXPECTED_SRS}"
           echo "MRS: ${ACTUAL_MRS}/${EXPECTED_MRS}"
+          echo "Surge: ${ACTUAL_SURGE}/${EXPECTED_SURGE}"
 
           [ "$ACTUAL_SRS" -eq "$EXPECTED_SRS" ]
           [ "$ACTUAL_MRS" -eq "$EXPECTED_MRS" ]
+          [ "$ACTUAL_SURGE" -eq "$EXPECTED_SURGE" ]
 
       - name: Generate rule-set checksums
         shell: bash
@@ -421,17 +505,17 @@ jobs:
 
           rm -f rulesets.sha256sum
 
-          find srs mrs \
+          find srs mrs surge \
             -maxdepth 1 \
             -type f \
-            \( -name '*.srs' -o -name '*.mrs' \) \
+            \( -name '*.srs' -o -name '*.mrs' -o -name '*.list' \) \
             -print0 2>/dev/null \
             | sort -z \
             | xargs -0 -r sha256sum \
             > rulesets.sha256sum
 
           if [ ! -s rulesets.sha256sum ]; then
-            echo "No SRS or MRS outputs configured." > rulesets.sha256sum
+            echo "No SRS, MRS or Surge outputs configured." > rulesets.sha256sum
           fi
 
       - name: Release files with timestamp
@@ -440,7 +524,7 @@ jobs:
           tag_name: ${{ steps.time.outputs.TIMESTAMP }}
           name: ${{ steps.time.outputs.TIMESTAMP }}
           body: |
-            Auto-built custom geosite.dat and selected rule sets.
+            Auto-built custom geosite.dat, SRS, MRS and Surge rule sets.
 
             Build time: ${{ steps.time.outputs.TIMESTAMP }} HKT
           draft: false
@@ -452,6 +536,7 @@ jobs:
             rulesets.sha256sum
             srs/*.srs
             mrs/*.mrs
+            surge/*.list
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -461,7 +546,7 @@ jobs:
           tag_name: release
           name: Latest Release
           body: |
-            Always contains the latest custom geosite.dat and selected rule sets.
+            Always contains the latest custom geosite.dat, SRS, MRS and Surge rule sets.
 
             Build time: ${{ steps.time.outputs.TIMESTAMP }} HKT
           draft: false
@@ -473,5 +558,6 @@ jobs:
             rulesets.sha256sum
             srs/*.srs
             mrs/*.mrs
+            surge/*.list
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
