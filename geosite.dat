@@ -1,32 +1,14 @@
 
-Æ2
-MYAIab.chatgpt.com
-
-openai#accounts.google.com
-
-geminiai.azure.com
+ß(
+MYAIai.azure.com
 
 globalai.google.dev
 
-gemini#aistudio.google.com
-
-gemini1!alkalicore-pa.clients6.google.com
-
-gemini7'alkalimakersuite-pa.clients6.google.com
-
-gemini'android.chat.openai.com
-
-openaianthropic.com
+geminianthropic.com
 
 claudeanthropic.com
 
-globalapi.openai.com
-
-openaiapis.google.com
-
-geminiarkoselabs.com
-
-openaiauth.openai.com
+globalarkoselabs.com
 
 openai	auth0.com
 
@@ -38,17 +20,11 @@
 
 perplexitybard.google.com
 
-geminibard.google.com
-
-globalcdn.auth0.com
-
-openai)challenges.cloudflare.com
+global)challenges.cloudflare.com
 
 claude-challenges.cloudflare.com
 
-perplexitychat.openai.com
-
-openaichatgpt.com
+perplexitychatgpt.com
 
 globalchatgpt.com
 
@@ -113,8 +89,6 @@ perplexitydeepmind.com
 
 gemini!gemini.google.com
 
-gemini!gemini.google.com
-
 globalgemini.google
 
 gemini#generativeai.google
@@ -155,25 +129,19 @@ perplexityintercomcdn.com
 
 openai#intercomcdn.com
 
-perplexity#ios.chat.openai.com
-
-openaijetbrains.ai
+perplexityjetbrains.ai
 
 global%jnn-pa.googleapis.com
 
 gemini launchdarkly.com
 
-openailh3.google.com
-
-gemini)lh3.googleusercontent.com
+openai)lh3.googleusercontent.com
 
 gemini)lh5.googleusercontent.com
 
 geminilivekit.cloud
 
 openai%makersuite.google.com
-
-gemini%makersuite.google.com
 
 global#maps.googleapis.com
 
@@ -184,9 +152,7 @@ perplexity#ios.chat.openai.com
 global
 mistral.ai
 
-global mtalk.google.com
-
-gemini%notebooklm.google.com
+global%notebooklm.google.com
 
 global!notebooklm.google
 
@@ -209,13 +175,7 @@ oaicdn.com
 
 gemini2"oauthaccountmanager.googleapis.com
 
-gemini,ogads-pa.clients6.google.com
-
-geminiogs.google.com
-
-gemini openai.auth0.com
-
-openai
+gemini
 openai.com
 
 global
@@ -223,19 +183,13 @@ openai.com
 
 openai,openaiapi-site.azureedge.net
 
-global$operator.chatgpt.com
-
-openai3#optimizationguide-pa.googleapis.com
+global3#optimizationguide-pa.googleapis.com
 
 geminiperplexity.ai
 
 global!perplexity.ai
 
-perplexity#platform.openai.com
-
-openaiplay.google.com
-
-gemini#play.googleapis.com
+perplexity#play.googleapis.com
 
 gemini2"proactivebackend-pa.googleapis.com
 
@@ -249,13 +203,9 @@ perplexity#platform.openai.com
 
 openai	sentry.io
 
-perplexity/signaler-pa.clients6.google.com
+perplexity*signaler-pa.googleapis.com
 
-gemini*signaler-pa.googleapis.com
-
-gemini sora.chatgpt.com
-
-openaisora.com
+geminisora.com
 
 globalsora.com
 
@@ -280,15 +230,7 @@ perplexity2"streetviewpixels-pa.googleapis.com
 gemini
 stripe.com
 
-openai%tcr9i.chat.openai.com
-
 openai"td.doubleclick.net
-
-gemini!videos.openai.com
-
-openai*waa-pa.clients6.google.com
-
-geminiB2webchannel-alkalimakersuite-pa.clients6.google.com
 
 gemini
 workos.com
@@ -296,8 +238,6 @@ workos.com
 openaiworkoscdn.com
 
 openai(www.google-analytics.com
-
-geminiwww.google.com
 
 gemini"www.googleapis.com
 
@@ -321,17 +261,11 @@ workos.com
 
 global api.together.xyz
 
-globalbard.google.com
-
 global console.groq.com
 
 global3#copilot-proxy.githubusercontent.com
 
-global!gemini.google.com
-
 global1!generativelanguage.googleapis.com
-
-global%notebooklm.google.com
 
 globalsydney.bing.com
 
@@ -1157,14 +1091,8 @@ zzdtec.com
 zztfly.com^.*-aweme-.*\..*\..*$^.*-aweme-.*\..*\..*\..*$!^.*-aweme-.*\..*\..*\..*\..*$^amemv\.com\..*$^amemv\.com\..*\..*$^amemv\.com\..*\..*\..*$ ^amemv\.com\..*\..*\..*\..*$^awsdns-cn-..\.biz$^awsdns-cn-..\.com$^awsdns-cn-..\.net$^awsdns-cn-..\.top$^bytecdn\.com\..*$^bytecdn\.com\..*\..*$^bytecdn\.com\..*\..*\..*$"^bytecdn\.com\..*\..*\..*\..*$^bytecimg\.com\..*$^bytecimg\.com\..*\..*$^bytecimg\.com\..*\..*\..*$#^bytecimg\.com\..*\..*\..*\..*$^bytedance\.com\..*$^bytedance\.com\..*\..*$ ^bytedance\.com\..*\..*\..*$$ ^bytedance\.com\..*\..*\..*\..*$^bytedcdn\.com\..*$^bytedcdn\.com\..*\..*$^bytedcdn\.com\..*\..*\..*$#^bytedcdn\.com\..*\..*\..*\..*$^byteimg\.com\..*$^byteimg\.com\..*\..*$^byteimg\.com\..*\..*\..*$"^byteimg\.com\..*\..*\..*\..*$^byteimgc\.com\..*$^byteimgc\.com\..*\..*$^byteimgc\.com\..*\..*\..*$#^byteimgc\.com\..*\..*\..*\..*$^bytemaimg\.com\..*$^bytemaimg\.com\..*\..*$ ^bytemaimg\.com\..*\..*\..*$$ ^bytemaimg\.com\..*\..*\..*\..*$^dcarvod\.com\..*$^dcarvod\.com\..*\..*$^dcarvod\.com\..*\..*\..*$"^dcarvod\.com\..*\..*\..*\..*$^douyin\.com\..*$^douyin\.com\..*\..*$^douyin\.com\..*\..*\..*$!^douyin\.com\..*\..*\..*\..*$^douyincdn\.com\..*$^douyincdn\.com\..*\..*$ ^douyincdn\.com\..*\..*\..*$$ ^douyincdn\.com\..*\..*\..*\..*$^douyinliving\.com\..*$^douyinliving\.com\..*\..*$#^douyinliving\.com\..*\..*\..*$'#^douyinliving\.com\..*\..*\..*\..*$^douyinpic\.com\..*$^douyinpic\.com\..*\..*$ ^douyinpic\.com\..*\..*\..*$$ ^douyinpic\.com\..*\..*\..*\..*$^douyinstatic\.com\..*$^douyinstatic\.com\..*\..*$#^douyinstatic\.com\..*\..*\..*$'#^douyinstatic\.com\..*\..*\..*\..*$^douyinvod\.com\..*$^douyinvod\.com\..*\..*$ ^douyinvod\.com\..*\..*\..*$$ ^douyinvod\.com\..*\..*\..*\..*$^huoshan\.com\..*$^huoshan\.com\..*\..*$^huoshan\.com\..*\..*\..*$"^huoshan\.com\..*\..*\..*\..*$^huoshancdn\.com\..*$^huoshancdn\.com\..*\..*$!^huoshancdn\.com\..*\..*\..*$%!^huoshancdn\.com\..*\..*\..*\..*$^huoshanimg\.com\..*$^huoshanimg\.com\..*\..*$!^huoshanimg\.com\..*\..*\..*$%!^huoshanimg\.com\..*\..*\..*\..*$^huoshanlive\.com\..*$^huoshanlive\.com\..*\..*$"^huoshanlive\.com\..*\..*\..*$&"^huoshanlive\.com\..*\..*\..*\..*$^huoshanvideo\.net\..*$^huoshanvideo\.net\..*\..*$#^huoshanvideo\.net\..*\..*\..*$'#^huoshanvideo\.net\..*\..*\..*\..*$^huoshanvod\.com\..*$^huoshanvod\.com\..*\..*$!^huoshanvod\.com\..*\..*\..*$%!^huoshanvod\.com\..*\..*\..*\..*$^zjcdn\.com\..*$^zjcdn\.com\..*\..*$^zjcdn\.com\..*\..*\..*$ ^zjcdn\.com\..*\..*\..*\..*$
 ª
 MYDIRECTadfs.gftgrouphk.comcndoh.pubgalaxyappstore.comhkovpn.ledgerb.iohksslvpn.ledgerb.iotanx.comtest365.gftgrouphk.com
- 3
-MYDNS0 1dot1dot1dot1.cloudflare-dns.com
-
-global8888.google
-
-global)adblock.dns.dnswarden.com
-
-global'adblock.doh.mullvad.net
+ö+
+MYDNS8888.google
 
 global%adblock.mydns.network
 
@@ -1181,8 +1109,6 @@ zztfly.com^.*-aweme-.*\..*\..*$^.*-aweme-.*\..*\..*\..*$!^.*-aw
 global'child-noads.joindns4.eu
 
 global!child.joindns4.eu
-
-global)chrome.cloudflare-dns.com
 
 global!cleanbrowsing.org
 
@@ -1287,26 +1213,14 @@ dns.t53.de
 
 globaldns.wevpn.com
 
-global dns1.dnscrypt.ca
-
 global!dns1.in-berlin.de
-
-global%dns1.ipv6.dnscrypt.ca
 
 globaldns10.quad9.net
 
 globaldns11.quad9.net
 
 global	dns114.cn	
-china dns2.dnscrypt.ca
-
-global!dns2.in-berlin.de
-
-global%dns2.ipv6.dnscrypt.ca
-
-global(dns64.cloudflare-dns.com
-
-global dns64.dns.google
+china!dns2.in-berlin.de
 
 globaldns9.quad9.net
 
@@ -1334,8 +1248,6 @@ doh.42l.fr
 
 global%doh.alternate-dns.com
 
-global'doh.applied-privacy.net
-
 global$doh.armadillodns.net
 
 globaldoh.baidu.com	
@@ -1343,14 +1255,9 @@ doh.42l.fr
 
 global(doh.centraleu.pi-dns.com
 
-global%doh.cleanbrowsing.org
-
 globaldoh.comodo.com
 
 globaldoh.crypto.sx
-
-global
-doh.dns.sb
 
 global!doh.dnsfilter.com
 
@@ -1359,8 +1266,6 @@ doh.dns.sb
 global!doh.dnswarden.com
 
 global%doh.eastus.pi-dns.com
-
-global,doh.familyshield.opendns.com
 
 globaldoh.ffmuc.net
 
@@ -1373,8 +1278,6 @@ doh.iij.jp
 
 globaldoh.li
 
-globaldoh.libredns.gr
-
 globaldoh.mullvad.net
 
 global'doh.nekomimi-router.com
@@ -1384,11 +1287,7 @@ doh.iij.jp
 global&doh.northeu.pi-dns.com
 
 globaldoh.onedns.net	
-chinadoh.opendns.com
-
-global doh.powerdns.com
-
-global doh.powerdns.org
+china doh.powerdns.com
 
 globaldoh.pub	
 china
@@ -1434,10 +1333,6 @@ dot.360.cn
 
 global-family.canadianshield.cira.ca
 
-global)family.cloudflare-dns.com
-
-global&fi.doh.dns.snopyta.org
-
 global	fische.io
 
 global$freedns.controld.com
@@ -1464,8 +1359,6 @@ dot.360.cn
 
 global"max.rethinkdns.com
 
-global*mozilla.cloudflare-dns.com
-
 globalneutopia.org
 
 global!noads.joindns4.eu
@@ -1477,8 +1370,6 @@ dot.360.cn
 globalopendns.com
 
 globalopennic.net
-
-globalordns.he.net
 
 globalpowerdns.org
 
@@ -1499,10 +1390,6 @@ restena.lu
 
 global safeservedns.com
 
-global5%security-filter-dns.cleanbrowsing.org
-
-global+security.cloudflare-dns.com
-
 global"sfw.overthebox.ovh
 
 globalsg01.dns4me.net
@@ -1511,8 +1398,7 @@ restena.lu
 
 global"sky.rethinkdns.com
 
-globalsm2.doh.pub	
-chinasnopyta.org
+globalsnopyta.org
 
 globaltenta.io
 
