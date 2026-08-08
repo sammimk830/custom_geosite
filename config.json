@@ -66,8 +66,7 @@
     },
     "mycn": {
       "urls": [
-        "https://raw.githubusercontent.com/Accademia/Additional_Rule_For_Clash/refs/heads/main/China/China_Domain.yaml",
-        "https://raw.githubusercontent.com/Accademia/Additional_Rule_For_Clash/refs/heads/main/GeositeCN/GeositeCN_Domain.yaml"
+        "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/direct.txt"
       ],
       "local_files": [],
       "inline_rules": [],
