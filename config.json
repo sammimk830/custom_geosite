@@ -72,6 +72,14 @@
       "inline_rules": [],
       "exclude_rules": []
     },
+    "cn": {
+      "urls": [
+        "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/direct.txt"
+      ],
+      "local_files": [],
+      "inline_rules": [],
+      "exclude_rules": []
+    },
     "mymicrosoft": {
       "urls": [
         "https://raw.githubusercontent.com/Accademia/Additional_Rule_For_Clash/refs/heads/main/MicrosoftAPPs/MicrosoftAPPs_Domain.yaml"
