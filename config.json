@@ -126,9 +126,21 @@
           "attr": "perplexity"
         },
         {
+          "url": "https://raw.githubusercontent.com/sammimk830/Private-Rules/refs/heads/main/Rules/Clash/PerplexityDomain.txt",
+          "attr": "cursor"
+        },
+        {
           "url": "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/refs/heads/master/Clash/Ruleset/AI.list",
           "attr": "global"
         }
+      ],
+      "local_files": [],
+      "inline_rules": [],
+      "exclude_rules": []
+    },
+    "mygoogle":{
+      "urls": [
+        "https://raw.githubusercontent.com/peiyingyao/Rule-for-OCD/refs/heads/master/rule/Clash/Google/Google_OCD_Domain.yaml"
       ],
       "local_files": [],
       "inline_rules": [],
@@ -142,14 +154,16 @@
       "mylan",
       "myapple",
       "mycn",
-      "mymicrosoft"
+      "mymicrosoft",
+      "mygoogle"
     ],
     "mrs": [
       "mydirect",
       "myproxy",
       "mylan",
       "mycn",
-      "mymicrosoft"
+      "mymicrosoft",
+      "mygoogle"
     ],
     "surge": [
       "mydirect",
@@ -157,7 +171,8 @@
       "mylan",
       "myapple",
       "mycn",
-      "mymicrosoft"
+      "mymicrosoft",
+      "mygoogle"
     ]
   },
   "ruleset_attr_outputs": {
