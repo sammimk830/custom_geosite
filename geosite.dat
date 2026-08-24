@@ -21953,7 +21953,7 @@ zzzqqp.com
 zzzsxx.com
 zzzxwh.net	zzzyb.comzzzymjg.com	zzzyy.com
 zzzyyy.comzzzzaaaa.com	zzzzzz.me
-ù*
+ñ)
 MYAIai.azure.com
 
 globalai.google.dev
@@ -21968,8 +21968,6 @@ zzzyyy.comzzzzaaaa.com	zzzzzz.me
 
 claude	auth0.com
 
-cursor	auth0.com
-
 global	auth0.com
 
 openai	auth0.com
@@ -21978,9 +21976,7 @@ perplexitybard.google.com
 
 global)challenges.cloudflare.com
 
-claude)challenges.cloudflare.com
-
-cursor-challenges.cloudflare.com
+claude-challenges.cloudflare.com
 
 perplexitychatgpt.com
 
@@ -22007,16 +22003,23 @@ claude.com
 
 global"csp.withgoogle.com
 
-gemini
+geminicursor-cdn.com
+
+cursor
+cursor.com
+
+cursor
 cursor.com
 
 global	cursor.sh
 
-globaldatadoghq.com
+cursor	cursor.sh
 
-claudedatadoghq.com
+globalcursorapi.com
 
 cursordatadoghq.com
+
+claudedatadoghq.com
 
 openai!datadoghq.com
 
@@ -22077,8 +22080,6 @@ google.com
 
 claudeintercom.io
 
-cursorintercom.io
-
 globalintercom.io
 
 openaiintercom.io
@@ -22086,8 +22087,6 @@ google.com
 perplexityintercomcdn.com
 
 claudeintercomcdn.com
-
-cursorintercomcdn.com
 
 globalintercomcdn.com
 
@@ -22151,8 +22150,6 @@ openai.com
 
 geminiperplexity.ai
 
-cursorperplexity.ai
-
 global!perplexity.ai
 
 perplexity#play.googleapis.com
@@ -22166,8 +22163,6 @@ perplexity#play.googleapis.com
 openai	sentry.io
 
 claude	sentry.io
-
-cursor	sentry.io
 
 openai	sentry.io
 
@@ -22185,15 +22180,11 @@ perplexity*signaler-pa.googleapis.com
 
 claudestatsig.com
 
-cursorstatsig.com
-
 openaistatsig.com
 
 perplexitystatsigapi.net
 
 claudestatsigapi.net
-
-cursorstatsigapi.net
 
 openai"statsigapi.net
 
@@ -22205,6 +22196,9 @@ stripe.com
 openai"td.doubleclick.net
 
 gemini
+workos.com
+
+cursor
 workos.com
 
 openaiworkoscdn.com
