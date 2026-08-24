@@ -126,7 +126,7 @@
           "attr": "perplexity"
         },
         {
-          "url": "https://raw.githubusercontent.com/sammimk830/Private-Rules/refs/heads/main/Rules/Clash/PerplexityDomain.txt",
+          "url": "https://raw.githubusercontent.com/sammimk830/Private-Rules/refs/heads/main/Rules/Clash/CursorDomain.yaml",
           "attr": "cursor"
         },
         {
@@ -187,6 +187,7 @@
         "openai",
         "claude",
         "perplexity",
+        "cursor",
         "global"
       ]
     },
@@ -201,6 +202,7 @@
         "openai",
         "claude",
         "perplexity",
+        "cursor",
         "global"
       ]
     },
@@ -215,6 +217,7 @@
         "openai",
         "claude",
         "perplexity",
+        "cursor",
         "global"
       ]
     }
