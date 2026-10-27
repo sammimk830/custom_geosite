@@ -61145,8 +61145,6 @@ DOMAIN-SUFFIX,long7.com
 DOMAIN-SUFFIX,longanlaw.com
 DOMAIN-SUFFIX,longau.com
 DOMAIN-SUFFIX,longbenren.com
-DOMAIN-SUFFIX,longbridgeapp.com
-DOMAIN-SUFFIX,longbridgehk.com
 DOMAIN-SUFFIX,longcai.com
 DOMAIN-SUFFIX,longcai027.com
 DOMAIN-SUFFIX,longcat.chat
@@ -79016,7 +79014,9 @@ DOMAIN-SUFFIX,sh-nemoto.com
 DOMAIN-SUFFIX,sh-oca.com
 DOMAIN-SUFFIX,sh-pet.com
 DOMAIN-SUFFIX,sh-pn.com
+DOMAIN-SUFFIX,sh-pod1-smp-device.apple.com
 DOMAIN-SUFFIX,sh-pod2-smp-device.apple.com
+DOMAIN-SUFFIX,sh-pod3-smp-device.apple.com
 DOMAIN-SUFFIX,sh-pp.com
 DOMAIN-SUFFIX,sh-printing.com
 DOMAIN-SUFFIX,sh-prosperity.com
