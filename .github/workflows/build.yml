@@ -577,8 +577,10 @@ jobs:
           fi
 
       - name: Release files with timestamp
+        id: timestamp_release
+        continue-on-error: true
         uses: softprops/action-gh-release@v2
-        with:
+        with: &timestamp_release
           tag_name: ${{ steps.time.outputs.TIMESTAMP }}
           name: ${{ steps.time.outputs.TIMESTAMP }}
           body: |
@@ -588,6 +590,7 @@ jobs:
           draft: false
           prerelease: false
           make_latest: false
+          preserve_order: true
           files: |
             geosite.dat
             geosite.dat.sha256sum
@@ -598,9 +601,22 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Update fixed release tag
+      - name: Wait before retrying timestamp release
+        if: steps.timestamp_release.outcome == 'failure'
+        run: sleep 10
+
+      - name: Retry timestamp release
+        if: steps.timestamp_release.outcome == 'failure'
         uses: softprops/action-gh-release@v2
-        with:
+        with: *timestamp_release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update fixed release tag
+        id: fixed_release
+        continue-on-error: true
+        uses: softprops/action-gh-release@v2
+        with: &fixed_release
           tag_name: release
           name: Latest Release
           body: |
@@ -610,6 +626,7 @@ jobs:
           draft: false
           prerelease: false
           make_latest: true
+          preserve_order: true
           files: |
             geosite.dat
             geosite.dat.sha256sum
@@ -617,5 +634,16 @@ jobs:
             srs/*.srs
             mrs/*.mrs
             surge/*.list
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Wait before retrying fixed release
+        if: steps.fixed_release.outcome == 'failure'
+        run: sleep 10
+
+      - name: Retry fixed release
+        if: steps.fixed_release.outcome == 'failure'
+        uses: softprops/action-gh-release@v2
+        with: *fixed_release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
